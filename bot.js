@@ -21,11 +21,11 @@ client.on('ready', () => {
         {
             status = "0 Players";
             count = 0;
-            client.user.setActivity(status, {type: 'PLAYING'});
+            client.user.setActivity(status, {type: 'WATCHING'});
         }
         else
         {
-            client.user.setActivity("0 Players", {type: 'PLAYING'});
+            client.user.setActivity("0 Players", {type: 'WATCHING'});
         }
     })
     const interval = setInterval(function setStatus(){
@@ -40,12 +40,12 @@ function UpdateStatus()
         if(error)
         {
             status = "0 Players";
-            client.user.setActivity(status, {type: 'PLAYING'});
+            client.user.setActivity(status, {type: 'WATCHING'});
         }
         else
         {
             status = `${response['online']} Players`;
-            client.user.setActivity(status, {type: 'PLAYING'});
+            client.user.setActivity(status, {type: 'WATCHING'});
         }
     })
 }
@@ -71,6 +71,13 @@ function getServerInfo(msg)
                         { name: 'Status', value: '🔴Offline', inline: false },
                         { name: 'Players', value: '0/0', inline: false },
                     ],
+                    thumbnail: {
+                        url: 'https://dewatarp.xyz/DEWATA.png',
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                        text: 'Join us @dewatarp.xyz',
+                    }
                 }
             }
             msg.edit(logMessage);
@@ -93,6 +100,13 @@ function getServerInfo(msg)
                         { name: 'Status', value: ':green_circle:Online', inline: false },
                         { name: 'Players', value: `${response['online']}/${response['maxplayers']}`, inline: false },
                     ],
+                    thumbnail: {
+                        url: 'https://dewatarp.xyz/DEWATA.png',
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                        text: 'Join us @dewatarp.xyz',
+                    }
                 }
             }
             msg.edit(logMessage);
@@ -108,10 +122,11 @@ function helpinfo(msg)
             title: 'List Command',
             color: embedColor,
             fields: [
-                { name: '/help', value: 'list cmd', inline: false },
-                { name: '/info', value: 'get server info', inline: false },
-                { name: '/players', value: 'get players online', inline: false },
-                { name: '/test', value: 'starting a live stats (beta)', inline: false },
+                { name: '```/help```', value: 'list cmd', inline: false },
+                { name: '```/info```', value: 'get server info', inline: false },
+                { name: '```/players```', value: 'get players online', inline: false },
+                { name: '```/start```', value: 'starting a live stats (beta)', inline: false },
+                { name: '```/takerole [IC NAME]```', value: 'Taking some role on guild', inline: false },
             ],
         }
     }
@@ -158,11 +173,11 @@ client.on('message', msg => {
                 .then(msg => {
                     setTimeout(function() {
                         getServerInfo(msg)
-                    }, 3000)
+                    }, 1000)
                 })
                 break;
             case "start":
-                if(msg.member.roles.find(rs => rs.name ,"DEV"))
+                if(msg.member.roles.has('805471217565433927'))
                 {
                     msg.delete(command)
                     msg.channel.send('ONLINE STATUS')
@@ -174,19 +189,21 @@ client.on('message', msg => {
                 }
                 else
                 {
-                    msg.reply("You don't have permission to use this command")
+                    msg.reply("You don't have permission")
                 }
                 break;
             case "stop":
+                msg.react('👍')
                 clearInterval(s);
                 break;
             case "takerole":
-                let role = msg.guild.roles.find(r => r.name == "WARGA");
+                let role = msg.guild.roles.find(r => r.id == "805473200422649876");
                 let member = msg.mentions.members.first();
-                if(msg.member.roles.find("name","WARGA")) return msg.reply("You have role <@&805473200422649876>")
+                if(msg.channel.id != '813750075736981534') return msg.channel.send("You can't use command here")
+                if(msg.member.roles.has('805473200422649876')) return msg.reply("You have role <@&805473200422649876>")
                 if(msg.channel.type == "dm") return msg.channel.send("You can't use that on dm!!")
                 if(!parameters.length) return msg.channel.send("Please input your rp name")
-                    const nick = "[WARGA]" + parameters.join("  ")
+                const nick = "[WARGA]" + parameters.join("  ")
                 if(nick.length > 32) return msg.channel.send("Your name is to long")
                 msg.member.addRoles(role).catch(console.error)
                 msg.member.setNickname(nick)
