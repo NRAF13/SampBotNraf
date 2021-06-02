@@ -2,7 +2,7 @@ const { Client, MessageEmbed, Channel, Message } = require('discord.js');
 const client = new Client;
 global.config = require("./config.json")
 const query = require("samp-query");
-const prefix = "/";
+const prefix = "!";
 let Samp_IP = "18.141.24.112";
 let Samp_Port = 7777;
 var channelid = '837571530904043601';
@@ -40,12 +40,12 @@ function UpdateStatus()
         if(error)
         {
             status = "0 Players";
-            client.user.setActivity(status, {type: 'WATCHING'});
+            client.user.setActivity(status, {type: 'PLAYING'});
         }
         else
         {
             status = `${response['online']} Players`;
-            client.user.setActivity(status, {type: 'WATCHING'});
+            client.user.setActivity(status, {type: 'PLAYING'});
         }
     })
 }
@@ -61,15 +61,15 @@ function getServerInfo(msg)
                 embed: {
                     title: 'DEWATA ROLEPLAY',
                     color: embedColor,
-                    url: 'https://dewatarp.xyz',
+                    url: 'https://dewatarp.xyz/',
                     fields: [
-                        { name: 'Server Name', value: 'Unknown', inline: false },
-                        { name: 'Website', value: 'Unknown', inline: false },
-                        { name: 'Ip', value: 'Unknown', inline: false },
-                        { name: 'Gamemode', value: 'Unknown', inline: false },
-                        { name: 'Mapname', value: 'Unknown', inline: false },
+                        { name: 'Server Name', value: 'Dewata Roleplay', inline: false },
+                        { name: 'Website', value: 'https://dewatarp.xyz', inline: false },
+                        { name: 'Ip', value: 'dewatarp.xyz', inline: false },
+                        { name: 'Gamemode', value: 'DRP v2.1.3b', inline: false },
+                        { name: 'Language', value: 'Bahasa Indonesia', inline: false },
                         { name: 'Status', value: '🔴Offline', inline: false },
-                        { name: 'Players', value: '0/0', inline: false },
+                        { name: 'Players', value: '0/100', inline: false },
                     ],
                     thumbnail: {
                         url: 'https://dewatarp.xyz/DEWATA.png',
@@ -122,11 +122,13 @@ function helpinfo(msg)
             title: 'List Command',
             color: embedColor,
             fields: [
-                { name: '```/help```', value: 'list cmd', inline: false },
-                { name: '```/info```', value: 'get server info', inline: false },
-                { name: '```/players```', value: 'get players online', inline: false },
-                { name: '```/start```', value: 'starting a live stats (beta)', inline: false },
-                { name: '```/takerole [IC NAME]```', value: 'Taking some role on guild', inline: false },
+                { name: `\`\`\`${prefix}help\`\`\``, value: 'list cmd', inline: false },
+                { name: `\`\`\`${prefix}info\`\`\``, value: 'get server info', inline: false },
+                { name: `\`\`\`${prefix}players\`\`\``, value: 'get players online', inline: false },
+                { name: `\`\`\`${prefix}start\`\`\``, value: 'starting a live stats (beta)', inline: false },
+                { name: `\`\`\`${prefix}takerole [IC NAME]\`\`\``, value: 'Taking some role on guild', inline: false },
+                { name: `\`\`\`${prefix}stop\`\`\``, value: 'stop live stats', inline: false },
+                { name: `\`\`\`${prefix}ping\`\`\``, value: 'getting ping', inline: false },
             ],
         }
     }
@@ -193,21 +195,37 @@ client.on('message', msg => {
                 }
                 break;
             case "stop":
-                msg.react('👍')
-                clearInterval(s);
+                if(msg.member.roles.has('805471217565433927'))
+                {
+                    msg.react('👍')
+                    clearInterval(s)
+                }
+                else
+                {
+                    msg.reply("You don't have permission")
+                }
                 break;
             case "takerole":
-                let role = msg.guild.roles.find(r => r.id == "805473200422649876");
-                let member = msg.mentions.members.first();
-                if(msg.channel.id != '813750075736981534') return msg.channel.send("You can't use command here")
+                if(msg.channel.id != '813750075736981534') return msg.channel.send("You can't use that command here")
                 if(msg.member.roles.has('805473200422649876')) return msg.reply("You have role <@&805473200422649876>")
                 if(msg.channel.type == "dm") return msg.channel.send("You can't use that on dm!!")
+                let role = msg.guild.roles.find(r => r.id == "805473200422649876");
+                let member = msg.mentions.members.first();
                 if(!parameters.length) return msg.channel.send("Please input your rp name")
                 const nick = "[WARGA]" + parameters.join("  ")
                 if(nick.length > 32) return msg.channel.send("Your name is to long")
                 msg.member.addRoles(role).catch(console.error)
                 msg.member.setNickname(nick)
                 msg.channel.send("You gain role <@&805473200422649876>");
+                break;
+            case "ping":
+                msg.channel.send("Calculating ping...")
+                .then(message => {
+                    setTimeout(function(){
+                        var ping = message.createdTimestamp - msg.createdTimestamp 
+                        message.edit(`${ping}ms`)
+                    }, 1000)
+                })
                 break;
             case "help":
                 helpinfo(msg)
