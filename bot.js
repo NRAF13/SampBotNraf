@@ -64,7 +64,7 @@ function getServerInfo(msg)
                     url: 'https://dewatarp.xyz/',
                     fields: [
                         { name: 'Server Name', value: 'Dewata Roleplay', inline: false },
-                        { name: 'Website', value: 'https://dewatarp.xyz', inline: false },
+                        { name: 'Website', value: 'https://dewatarp.xyz/', inline: false },
                         { name: 'Ip', value: 'dewatarp.xyz', inline: false },
                         { name: 'Gamemode', value: 'DRP v2.1.3b', inline: false },
                         { name: 'Language', value: 'Bahasa Indonesia', inline: false },
@@ -76,7 +76,7 @@ function getServerInfo(msg)
                     },
                     timestamp: new Date(),
                     footer: {
-                        text: 'Join us @dewatarp.xyz',
+                        text: 'DEWATA ROLEPLAY',
                     }
                 }
             }
@@ -93,10 +93,10 @@ function getServerInfo(msg)
                     url: 'https://dewatarp.xyz/',
                     fields: [
                         { name: 'Server Name', value: response['hostname'], inline: false },
-                        { name: 'Website', value: 'https://dewatarp.xyz', inline: false },
+                        { name: 'Website', value: 'https://dewatarp.xyz/', inline: false },
                         { name: 'Ip', value: 'dewatarp.xyz', inline: false },
                         { name: 'Gamemode', value: response['gamemode'], inline: false },
-                        { name: 'Mapname', value: response['mapname'], inline: false },
+                        { name: 'Language', value: response['mapname'], inline: false },
                         { name: 'Status', value: ':green_circle:Online', inline: false },
                         { name: 'Players', value: `${response['online']}/${response['maxplayers']}`, inline: false },
                     ],
@@ -105,7 +105,7 @@ function getServerInfo(msg)
                     },
                     timestamp: new Date(),
                     footer: {
-                        text: 'Join us @dewatarp.xyz',
+                        text: 'DEWATA ROLEPLAY',
                     }
                 }
             }
@@ -130,6 +130,13 @@ function helpinfo(msg)
                 { name: `\`\`\`${prefix}stop\`\`\``, value: 'stop live stats', inline: false },
                 { name: `\`\`\`${prefix}ping\`\`\``, value: 'getting ping', inline: false },
             ],
+            thumbnail: {
+                url: 'https://dewatarp.xyz/DEWATA.png',
+            },
+            timestamp: new Date(),
+            footer: {
+                text: 'Join us @dewatarp.xyz',
+            }
         }
     }
     msg.channel.send(logMessage);
@@ -179,9 +186,9 @@ client.on('message', msg => {
                 })
                 break;
             case "start":
-                if(msg.member.roles.has('805471217565433927'))
+                if(msg.member.roles.cache.has('805471217565433927'))
                 {
-                    msg.delete(command)
+                    msg.channel.bulkDelete(1)
                     msg.channel.send('ONLINE STATUS')
                     .then(msg => {
                         s = setInterval(function() {
@@ -195,7 +202,7 @@ client.on('message', msg => {
                 }
                 break;
             case "stop":
-                if(msg.member.roles.has('805471217565433927'))
+                if(msg.member.roles.cache.has('805471217565433927'))
                 {
                     msg.react('👍')
                     clearInterval(s)
@@ -205,18 +212,30 @@ client.on('message', msg => {
                     msg.reply("You don't have permission")
                 }
                 break;
-            case "takerole":
-                if(msg.channel.id != '813750075736981534') return msg.channel.send("You can't use that command here")
-                if(msg.member.roles.has('805473200422649876')) return msg.reply("You have role <@&805473200422649876>")
+            case "takerole"://805473200422649876
+                if(msg.channel.id != '813750075736981534') return
+                if(msg.member.roles.cache.has('805473200422649876')) return
                 if(msg.channel.type == "dm") return msg.channel.send("You can't use that on dm!!")
-                let role = msg.guild.roles.find(r => r.id == "805473200422649876");
+                let role = msg.guild.roles.cache.find(r => r.id == "805473200422649876");
                 let member = msg.mentions.members.first();
                 if(!parameters.length) return msg.channel.send("Please input your rp name")
-                const nick = "[WARGA]" + parameters.join("  ")
+                const nick = "[WARGA] " + parameters.join(" ")
                 if(nick.length > 32) return msg.channel.send("Your name is to long")
-                msg.member.addRoles(role).catch(console.error)
-                msg.member.setNickname(nick)
-                msg.channel.send("You gain role <@&805473200422649876>");
+                try {
+                    msg.member.roles.add(role);
+                    msg.channel.send("**YOU GAIN ROLE <@&805473200422649876>, AND WELCOME TO DEWATA ROLEPLAY**")
+                } catch{
+                    msg.reply("I Can't Add roles for this user");
+                    console.error("Error");
+                };
+                try{
+                    msg.member.setNickname(nick);
+                }
+                catch{
+                    msg.reply("I Can't change the nickname for this user");
+                };
+                //msg.member.roles.add(role).catch(msg.reply("I Can't Add roles for this user"))
+                //msg.member.setNickname(nick).catch(msg.reply("I Can't change the nickname for this user"))
                 break;
             case "ping":
                 msg.channel.send("Calculating ping...")
@@ -227,11 +246,25 @@ client.on('message', msg => {
                     }, 1000)
                 })
                 break;
+            case "tendang":
+                if(msg.member.roles.cache.has('805471217565433927'))
+                {
+                    if(msg.mentions.members.first()){
+                        msg.mentions.members.first().kick().catch(msg.reply("I Can't kick this user"));
+                    }
+                    else
+                    {
+                        msg.reply("Plesae tag someone, EX:```!tendang @Alpa#1234```")
+                    }
+                }
+                else
+                {
+                    msg.reply("You don't have permission")
+                }
+                break;
             case "help":
                 helpinfo(msg)
                 break;
-            default:
-                msg.reply(`Unknown command`);
         }
     }
 })
