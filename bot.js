@@ -4,7 +4,7 @@ global.config = require("./config.json")
 const query = require("samp-query");
 const prefix = "!";
 let Samp_IP = "18.141.24.112";
-let Samp_Port = 7777;
+let Samp_Port = 13210;
 var channelid = '837571530904043601';
 
 var options = {
@@ -226,13 +226,14 @@ client.on('message', msg => {
                     msg.channel.send("**YOU GAIN ROLE <@&805473200422649876>, AND WELCOME TO DEWATA ROLEPLAY**")
                 } catch{
                     msg.reply("I Can't Add roles for this user");
-                    console.error("Error");
+                    console.log(Error);
                 };
                 try{
                     msg.member.setNickname(nick);
                 }
                 catch{
                     msg.reply("I Can't change the nickname for this user");
+                    console.log(Error)
                 };
                 //msg.member.roles.add(role).catch(msg.reply("I Can't Add roles for this user"))
                 //msg.member.setNickname(nick).catch(msg.reply("I Can't change the nickname for this user"))
