@@ -7,7 +7,11 @@
     "start": "node bot.js"
   },
   "dependencies": {
+    "better-sqlite3": "^7.4.1",
+    "discord-button": "^1.0.3",
+    "discord-buttons": "^3.2.1",
     "discord.js": "^12.5.3",
+    "djs-tickets": "^5.0.0",
     "request": "2.81.0",
     "samp-query": "^0.1.4"
   }

@@ -1,12 +1,19 @@
 const { Client, MessageEmbed, Channel, Message } = require('discord.js');
+const discord = require('discord.js')
+const { get } = require('request');
 const client = new Client;
 global.config = require("./config.json")
 const query = require("samp-query");
-const getServerPing = require('./src/samp.js')
+const { getServerPing, getServerOnline } = require('./src/samp.js')
+require('discord-buttons')(client)
+const { MessageButton, MessageActionRow } = require('discord-buttons')
+const ticket = require('djs-tickets')
 const prefix = "!";
 let Samp_IP = "18.141.24.112";
-let Samp_Port = 7777;
-var channelid = '837571530904043601';
+let Samp_Port = 1255;
+
+ticket.token(config.token)
+ticket.prefix("drp!")
 
 var options = {
     host: Samp_IP,
@@ -18,6 +25,31 @@ client.on('ready', () => {
     console.log(`Bot ${client.user.tag} is going online!!`);
     UpdateStatus();setInterval(UpdateStatus,30000)
 });
+
+function CreateButton(msg)
+{
+    const embd = new MessageEmbed()
+    .setTitle("Reaction Roles")
+    .setColor(0x800080)
+    .setDescription("Press the button to get roles <@&805473200422649876>")
+
+    const add = new MessageButton()
+    .setStyle("green")
+    .setLabel("Take")
+    .setID("1")
+
+    msg.channel.send({buttons: add, embed: embd})
+}
+
+client.on('clickButton', async (button) => {
+    if(button.id == '1')
+    {
+        button.reply.send(`You gain role <@&805473200422649876>`, true)
+        const role = button.guild.roles.cache.get('805473200422649876')
+        const member = button.clicker.member
+        await member.roles.add(role)
+    }
+})
 
 function UpdateStatus()
 {
@@ -53,10 +85,14 @@ function UpdateStatus()
 
 function getServerInfo(msg)
 {
-    getServerPing("s1.dewatarp.xyz", 7777, function(error,response){
+    getServerPing("s1.dewatarp.xyz", 1255, function(error,response){
         if(!error)
         {
             spg = `${response}ms`
+        }
+        else
+        {
+            spg = "0ms"
         }
     })
     const randpesan = [
@@ -133,10 +169,14 @@ function getServerInfo(msg)
 }
 function ServerStatus(msg)
 {
-    getServerPing("s1.dewatarp.xyz", 7777, function(error,response){
+    getServerPing("s1.dewatarp.xyz", 1255, function(error,response){
         if(!error)
         {
             spg = `${response}ms`
+        }
+        else
+        {
+            spg = "0ms"
         }
     })
     query(options, function(error, response){
@@ -231,6 +271,26 @@ function helpinfo(msg)
     msg.channel.send(logMessage);
 }
 
+function pengumuman (msg,params)
+{
+    if(params)
+    {
+        msg.channel.send("@everyone")
+        const ann = new MessageEmbed()
+        .setTitle("Announcement")
+        .setDescription(`**\`\`\`${params}\`\`\`**`)
+        .setFooter("DEWATA ROLEPLAY")
+        .setTimestamp(new Date())
+        .setColor("ff0000")
+
+        msg.channel.send(ann)
+    }
+    else
+    {
+        msg.channel.send("Usage: ```!ann [Text]```")
+    }
+}
+
 client.on('message', msg => {
     if(msg.content.charAt(0) == prefix)
     {
@@ -250,19 +310,21 @@ client.on('message', msg => {
         switch(command.toLowerCase())
         {
             case "players":
+                var p1
                 msg.channel.send(`Checking players...`)
                 .then(msg => {
                     setTimeout(function(){
-                        query(options, function (error, response) {
+                        query(options, function(error,response){
                             if(error)
                             {
-                                msg.edit(`Server is now offline`)
+                                p1 = 0
                             }
                             else
                             {
-                                msg.edit(`Players: ${response['online']}`)
+                                p1 = `${response['online']}`
                             }
                         })
+                        msg.edit(`${p1} Players`)
                     }, 1000)
                 })
                 break;
@@ -303,32 +365,12 @@ client.on('message', msg => {
                     msg.reply("You don't have permission")
                 }
                 break;
-            case "takerole"://805473200422649876
-                if(msg.channel.id != '813750075736981534') return
-                if(msg.member.roles.cache.find(rs => rs.id == '805473200422649876')) return
-                if(msg.channel.type == "dm") return msg.channel.send("You can't use that on dm!!")
-                let role = msg.guild.roles.cache.find(r => r.id == "805473200422649876");
-                let member = msg.mentions.members.first();
-                if(!parameters.length) return msg.channel.send("Please input your rp name")
-                const nick = "[WARGA] " + parameters.join(" ")
-                if(nick.length > 32) return msg.channel.send("Your name is to long")
-                /*try {
-                    msg.member.roles.add(role);
-                    msg.channel.send("**YOU GAIN ROLE <@&805473200422649876>, AND WELCOME TO DEWATA ROLEPLAY**")
-                } catch{
-                    msg.reply("I Can't Add roles for this user");
-                    console.log(Error);
-                };
-                try{
-                    msg.member.setNickname(nick);
-                }
-                catch{
-                    msg.reply("I Can't change the nickname for this user");
-                    console.log(Error)
-                };*/
-                msg.member.roles.add(role).catch(console.log("Error Addng role"))
-                msg.member.setNickname(nick).catch(console.log("Error cange nick"))
-                break;
+            /*case "takerole"://805473200422649876
+                if(msg.channel.id != '859981291893424139') return
+                if(msg.member.roles.cache.has('805473200422649876')) return msg.reply("You already have!")
+                //if(msg.guild.members(guild.owner)) return msg.reply("I Can't Add Role For You")
+                msg.member.roles.add('805473200422649876').then(msg.channel.send("You gain a role <@&805473200422649876>"))
+                break;*/
             case "ping":
                 var svping;
                 getServerPing("s1.dewatarp.xyz", 7777, function(error,response){
@@ -359,6 +401,22 @@ client.on('message', msg => {
                     {
                         msg.reply("Plesae tag someone, EX:```!tendang @Alpa#1234```")
                     }
+                }
+                else
+                {
+                    msg.reply("You don't have permission")
+                }
+                break;
+            case "rr":
+                if(msg.channel.id != '859981291893424139') return
+                msg.channel.bulkDelete(1)
+                CreateButton(msg)
+                break;
+            case "ann":
+                if(msg.member.roles.cache.has('805471217565433927'))
+                {
+                    msg.channel.bulkDelete(1)
+                    pengumuman(msg, parameters.join(" "))
                 }
                 else
                 {

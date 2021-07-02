@@ -268,4 +268,4 @@ var getServerPing = function(serverip, serverport, reply) {
 	});
 }
 
-module.exports = getServerPing
+module.exports = { getServerPing, getServerOnline }
