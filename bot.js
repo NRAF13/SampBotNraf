@@ -13,7 +13,7 @@ let Samp_IP = "18.141.24.112";
 let Samp_Port = 1255;
 
 ticket.token(config.token)
-ticket.prefix("drp!")
+ticket.prefix(prefix)
 
 var options = {
     host: Samp_IP,
@@ -278,7 +278,7 @@ function pengumuman (msg,params)
         msg.channel.send("@everyone")
         const ann = new MessageEmbed()
         .setTitle("Announcement")
-        .setDescription(`**\`\`\`${params}\`\`\`**`)
+        .setDescription(`**${params}**`)
         .setFooter("DEWATA ROLEPLAY")
         .setTimestamp(new Date())
         .setColor("ff0000")
@@ -288,6 +288,18 @@ function pengumuman (msg,params)
     else
     {
         msg.channel.send("Usage: ```!ann [Text]```")
+    }
+}
+
+function clearmsg(msg,params)
+{
+    if(params)
+    {
+        msg.channel.bulkDelete(params)
+    }
+    else
+    {
+        msg.reply("Usage: ```!clean [ammount]```")
     }
 }
 
@@ -317,7 +329,7 @@ client.on('message', msg => {
                         query(options, function(error,response){
                             if(error)
                             {
-                                p1 = 0
+                                p1 = "Server is now Offline"
                             }
                             else
                             {
@@ -409,14 +421,26 @@ client.on('message', msg => {
                 break;
             case "rr":
                 if(msg.channel.id != '859981291893424139') return
+                if(!msg.member.hasPermission('ADMINISTRATOR')) return msg.reply("You can't use that")
                 msg.channel.bulkDelete(1)
                 CreateButton(msg)
                 break;
             case "ann":
-                if(msg.member.roles.cache.has('805471217565433927'))
+                if(msg.member.hasPermission('ADMINISTRATOR'))
                 {
                     msg.channel.bulkDelete(1)
                     pengumuman(msg, parameters.join(" "))
+                }
+                else
+                {
+                    msg.reply("You don't have permission")
+                }
+                break;
+            case "clean":
+                if(msg.member.hasPermission('ADMINISTRATOR'))
+                {
+                    msg.channel.bulkDelete(1)
+                    clearmsg(msg, parameters.join(" "))
                 }
                 else
                 {
