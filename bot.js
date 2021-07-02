@@ -279,8 +279,9 @@ function pengumuman (msg,params)
     {
         msg.channel.send("@everyone")
         const ann = new MessageEmbed()
-        .setTitle("Announcement")
+        .setTitle(`Announcement from ${msg.author.username}`)
         .setDescription(`**${params}**`)
+        .setThumbnail(`${msg.author.displayAvatarURL({format: 'png', dynamic: true })}`)
         .setFooter("DEWATA ROLEPLAY")
         .setTimestamp(new Date())
         .setColor("ff0000")
@@ -439,7 +440,7 @@ client.on('message', msg => {
                 }
                 break;
             case "clean":
-                if(msg.member.hasPermission('ADMINISTRATOR'))
+                if(msg.member.hasPermission('MANAGE_MESSAGES'))
                 {
                     msg.channel.bulkDelete(1)
                     clearmsg(msg, parameters.join(" "))
