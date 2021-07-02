@@ -260,6 +260,7 @@ function helpinfo(msg)
                 { name: `**\`\`\`${prefix}ping\`\`\`**`, value: '**getting ping**', inline: false },
                 { name: `**\`\`\`${prefix}rr\`\`\`**`, value: '**start the reaction role**', inline: false },
                 { name: `**\`\`\`${prefix}clean(beta)\`\`\`**`, value: '**clean message**', inline: false },
+                { name: `**\`\`\`${prefix}invite\`\`\`**`, value: '**Support Us!**', inline: false },
             ],
             thumbnail: {
                 url: 'https://dewatarp.xyz/DEWATA.png',
@@ -449,6 +450,17 @@ client.on('message', msg => {
                 {
                     msg.reply("You don't have permission")
                 }
+                break;
+            case "invite":
+                const inv = new MessageEmbed()
+                .setTitle("DEWATA ROLEPLAY")
+                .setDescription("Hello you can support us by invite our bot to your server. You can join to our samp server too\n**Join discord:\n__https://discord.dewatarp.xyz__**\n**Play on Our SAMP Server:\n__```css\ns1.dewatarp.xyz:1255\n```__**\n**Invite Me!:\n__https://discord.com/api/oauth2/authorize?client_id=838072866469445662&permissions=8&scope=bot__**\n***__Thanks to use me anyway!__***")
+                .setColor(0x800080)
+                .setImage('https://dewatarp.xyz/DEWATA.png')
+                .setThumbnail('https://dewatarp.xyz/DEWATA.png')
+                .setFooter("Join us @dewatarp.xyz")
+                .setTimestamp(new Date())
+                msg.channel.send(inv)
                 break;
             case "help":
                 helpinfo(msg)
