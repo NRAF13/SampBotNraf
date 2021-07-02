@@ -255,9 +255,11 @@ function helpinfo(msg)
                 { name: `**\`\`\`${prefix}status\`\`\`**`, value: '**get server status**', inline: false },
                 { name: `**\`\`\`${prefix}players\`\`\`**`, value: '**get players online**', inline: false },
                 { name: `**\`\`\`${prefix}start\`\`\`**`, value: '**starting a live stats**', inline: false },
-                { name: `**\`\`\`${prefix}takerole [IC NAME]\`\`\`**`, value: '**Taking some role on guild**', inline: false },
+                { name: `**\`\`\`${prefix}takerole(OFF)\`\`\`**`, value: '**Taking some role on guild**', inline: false },
                 { name: `**\`\`\`${prefix}stop\`\`\`**`, value: '**stop live stats**', inline: false },
                 { name: `**\`\`\`${prefix}ping\`\`\`**`, value: '**getting ping**', inline: false },
+                { name: `**\`\`\`${prefix}rr\`\`\`**`, value: '**start the reaction role**', inline: false },
+                { name: `**\`\`\`${prefix}clean(beta)\`\`\`**`, value: '**clean message**', inline: false },
             ],
             thumbnail: {
                 url: 'https://dewatarp.xyz/DEWATA.png',
