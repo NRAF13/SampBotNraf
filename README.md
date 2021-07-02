@@ -1,6 +1,3 @@
-Updates 02/07/2021
-1. Add ticketing system by PgamerXStudio
-2. Add announcement command
-3. Add reaction roles with button
+Thanks A Lot For Using My Code
 
-Remember: Bot host quality sangat berpengaruh pada performa bot
+I Hope You Like and if any problem you can make issues on this repo or message me on discord: NRAF#1000
