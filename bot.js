@@ -8,9 +8,32 @@ const { getServerPing, getServerOnline } = require('./src/samp.js')
 require('discord-buttons')(client)
 const { MessageButton, MessageActionRow } = require('discord-buttons')
 const ticket = require('djs-tickets')
+let Samp_IP = "s1.dewatarp.xyz"
+let Samp_Port = 7777
+const mysql = require('mysql');
+const RowDataPacket = require('mysql/lib/protocol/packets/RowDataPacket');
+const sqlcon = mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    password: '',
+    database: 'uirp'
+})
+/*sqlcon.connect()
+sqlcon.query('SELECT * FROM `samp` WHERE `id` = 0', [], function(err,row){
+    if(row)
+    {
+        var server_port = sqlcon.escape(row[0].ip)
+        var server_ip = parseInt(row[0].port)
+        console.log('Row ', server_port)
+        console.log('Row port ', server_ip)
+        Samp_IP = row[0].ip
+        Samp_Port = row[0].port
+        console.log('IP: ', Samp_IP)
+        console.log('Port: ', Samp_Port)
+    }
+    //Samp_Port = result
+})*/
 const prefix = "!";
-let Samp_IP = "18.141.24.112";
-let Samp_Port = 1255;
 
 ticket.token(config.token)
 ticket.prefix(prefix)
@@ -20,6 +43,7 @@ var options = {
     port: Samp_Port
 }
 var s;
+var p1;
 
 client.on('ready', () => {
     console.log(`Bot ${client.user.tag} is going online!!`);
@@ -53,13 +77,6 @@ client.on('clickButton', async (button) => {
 
 function UpdateStatus()
 {
-    const randpesan = [
-        "DEWATA ROLEPLAY",
-        "#DEWATARP",
-        "Join us @dewatarp.xyz"
-    ];
-    const randommes = Math.floor(Math.random() * (randpesan.length));
-    const newRandomMes = randpesan[randommes];
     const randstatus = [
         "PLAYING",
         "STREAMING",
@@ -77,7 +94,7 @@ function UpdateStatus()
         }
         else
         {
-            status = `${response['online']} Players | ${newRandomMes}`;
+            status = `${response['online']} Players | World Time: ${response['rules'].worldtime}`;
             client.user.setActivity(status, {type: `${newRandomStats}`});
         }
     })
@@ -118,7 +135,10 @@ function getServerInfo(msg)
                         { name: '**IP**', value: 'dewatarp.xyz', inline: false },
                         { name: '**Gamemode**', value: 'DRP v2.1.3b', inline: false },
                         { name: '**Language**', value: 'Bahasa Indonesia', inline: false },
-                        { name: '**Status**', value: '🔴Offline', inline: false },
+                        { name: '**Map**', value: 'Unknown', inline: false },
+                        { name: '**Weburl**', value: 'Unknown', inline: false },
+                        { name: '**Weather**', value: 'Unknown', inline: false },
+                        { name: '**Status**', value: ':mt:Offline', inline: false },
                         { name: '**Players**', value: '0/100', inline: false },
                         { name: '**Ping**', value: '0ms', inline: false },
                         { name: '**Pesan**', value: `${newRandomMes}`, inline: false },
@@ -149,7 +169,10 @@ function getServerInfo(msg)
                         { name: '**IP**', value: 'dewatarp.xyz', inline: false },
                         { name: '**Gamemode**', value: response['gamemode'], inline: false },
                         { name: '**Language**', value: response['mapname'], inline: false },
-                        { name: '**Status**', value: ':green_circle:Online', inline: false },
+                        { name: '**Map**', value: response['rules'].mapname, inline: false },
+                        { name: '**Weburl**', value: response['rules'].weburl, inline: false },
+                        { name: '**Weather**', value: response['rules'].weather, inline: false },
+                        { name: '**Status**', value: ':up:Online', inline: false },
                         { name: '**Players**', value: `${response['online']}/${response['maxplayers']}`, inline: false },
                         { name: '**Ping**', value: `${spg}`, inline: false },
                         { name: '**Pesan**', value: `${newRandomMes}`, inline: false },
@@ -261,6 +284,7 @@ function helpinfo(msg)
                 { name: `**\`\`\`${prefix}rr\`\`\`**`, value: '**start the reaction role**', inline: false },
                 { name: `**\`\`\`${prefix}clean(beta)\`\`\`**`, value: '**clean message**', inline: false },
                 { name: `**\`\`\`${prefix}invite\`\`\`**`, value: '**Support Us!**', inline: false },
+                { name: `**\`\`\`${prefix}samp\`\`\`**`, value: '**Getting information on other server**', inline: false },
             ],
             thumbnail: {
                 url: 'https://dewatarp.xyz/DEWATA.png',
@@ -297,9 +321,14 @@ function pengumuman (msg,params)
 
 function clearmsg(msg,params)
 {
-    if(params)
+    const ammount = parseInt(params)
+    if(ammount)
     {
-        msg.channel.bulkDelete(params)
+        if(params < 2 ||params > 100) return msg.reply('Invalid Ammound')
+        msg.channel.bulkDelete(ammount, true).catch(err => {
+            console.log(err)
+            msg.reply("An Error has ocurred")
+        })
     }
     else
     {
@@ -307,7 +336,98 @@ function clearmsg(msg,params)
     }
 }
 
+function stats(msg,params)
+{
+    if(params)
+    {
+        sqlcon.query(`SELECT * FROM accounts WHERE nickname = '${params}' LIMIT 1`, [], function(err,row){
+            if(row)
+            {
+                if(row.length)
+                {
+                    var sex
+                    if(row[0].sex == 0)
+                    {
+                        sex = "Unknown"
+                    }
+                    else if(row[0].sex == 1)
+                    {
+                        sex = "Male"
+                    }
+                    else if(row[0].sex == 2)
+                    {
+                        sex = "Female"
+                    }
+                    const statsemb = new MessageEmbed()
+                    .setTitle(`${row[0].nickname}`)
+                    .setColor(0x800080)
+                    .setAuthor(`${msg.author.username}`, msg.author.displayAvatarURL({format: 'png', dynamic: true }))
+                    .setDescription(`Your stats:\n💵**Money:** $${row[0].money}\t\t\t🏧**Bank Money:** $${row[0].bank}\n🎚️**Level:** ${row[0].level}\t\t\t🧯**Exp:** ${row[0].exp}\n👫**Gender:** ${sex}\t\t\t🔞**Age:** ${row[0].age}\n🥩**Hungry:** ${row[0].satiety}%\t\t\t🥤**Thirsty:** ${row[0].haus}%`)
+                    .setFooter(`Requested by ${msg.author.username}`)
+                    .setTimestamp(new Date())
+                    msg.channel.send(statsemb)
+                }
+                else
+                {
+                    msg.reply('Username not found!')
+                }
+            }
+            else
+            {
+                msg.reply(`SQL ERROR: ${err}`)
+            }
+        })
+    }
+    else
+    {
+        msg.reply('USAGE: ```!stats [IC NAME]```')
+    }
+}
+
 client.on('message', msg => {
+    if(!msg.content.startsWith(prefix) || msg.author.bot) return
+    const args = msg.content.trim().split(/\s+/g)
+    const cmd = args.shift().toLowerCase()
+
+    if(cmd == '!samp')
+    {
+        if(!args.length) return msg.channel.send("USAGE: !samp [Ip][Port]")
+        else if(!args[1]) return msg.channel.send("You didn't input the port")
+        else if(args[2]) return msg.channel.send("Error")
+
+        let server_ip = args[0]
+        let server_port = parseInt(args[1])
+        console.log(`Debug: ${server_ip}:${server_port}`)
+        var samp = {
+            host: server_ip,
+            port: server_port
+        }
+        query(samp, function(error,response){
+            if(error)
+            {
+                msg.channel.send("Server Unavailable")
+            }
+            else
+            {
+                const serger = new MessageEmbed()
+                .setTitle(`${response['hostname']}`)
+                .setColor('#800080')
+                .addFields(
+                    { name: 'Gamemode', value: `${response['gamemode']}`, inline: false},
+                    { name: 'Players', value: `${response['online']}/${response['maxplayers']}`, inline: false },
+                    { name: 'Language', value: `${response['mapname']}`, inline: false},
+                    { name: 'Version', value: `${response['rules'].version}`, inline: false},
+                    { name: 'Website', value: `${response['rules'].weburl}`, inline: false},
+                    { name: 'Map', value: `${response['rules'].mapname}`, inline: false}
+                )
+                .setThumbnail('https://dewatarp.xyz/DEWATA.png')
+                .setFooter('Join us @dewatarp.xyz', 'https://dewatarp.xyz/DEWATA.png')
+                .setTimestamp(new Date())
+                 msg.channel.send(serger)
+                 console.log(response)
+            }
+        })
+    }
     if(msg.content.charAt(0) == prefix)
     {
         const request = msg.content.substr(1);
@@ -326,21 +446,19 @@ client.on('message', msg => {
         switch(command.toLowerCase())
         {
             case "players":
-                var p1
                 msg.channel.send(`Checking players...`)
                 .then(msg => {
                     setTimeout(function(){
                         query(options, function(error,response){
                             if(error)
                             {
-                                p1 = "Server is now Offline"
+                                msg.edit("Server is Offline")
                             }
                             else
                             {
-                                p1 = `${response['online']}`
+                                msg.edit(`${response['online']} Players`)
                             }
                         })
-                        msg.edit(`${p1} Players`)
                     }, 1000)
                 })
                 break;
@@ -411,7 +529,10 @@ client.on('message', msg => {
                 if(msg.member.roles.cache.has('805471217565433927'))
                 {
                     if(msg.mentions.members.first()){
-                        msg.mentions.members.first().kick().catch(msg.reply("I Can't kick this user"));
+                        msg.mentions.members.first().kick().catch(err => {
+                            console.log(err)//Debug
+                            msg.reply("I Can't Kick This User")
+                        });
                     }
                     else
                     {
@@ -430,6 +551,7 @@ client.on('message', msg => {
                 CreateButton(msg)
                 break;
             case "ann":
+                if(msg.channel.type == 'dm') return msg.reply("You can't use that here")
                 if(msg.member.hasPermission('ADMINISTRATOR'))
                 {
                     msg.channel.bulkDelete(1)
@@ -441,6 +563,7 @@ client.on('message', msg => {
                 }
                 break;
             case "clean":
+                if(msg.channel.type == 'dm') return msg.reply("You can't use that here")
                 if(msg.member.hasPermission('MANAGE_MESSAGES'))
                 {
                     msg.channel.bulkDelete(1)
@@ -461,6 +584,9 @@ client.on('message', msg => {
                 .setFooter("Join us @dewatarp.xyz")
                 .setTimestamp(new Date())
                 msg.channel.send(inv)
+                break;
+            case "stats":
+                stats(msg, parameters.join(" "))
                 break;
             case "help":
                 helpinfo(msg)
