@@ -282,7 +282,7 @@ function helpinfo(msg)
                 { name: `**\`\`\`${prefix}stop\`\`\`**`, value: '**stop live stats**', inline: false },
                 { name: `**\`\`\`${prefix}ping\`\`\`**`, value: '**getting ping**', inline: false },
                 { name: `**\`\`\`${prefix}rr\`\`\`**`, value: '**start the reaction role**', inline: false },
-                { name: `**\`\`\`${prefix}clean(beta)\`\`\`**`, value: '**clean message**', inline: false },
+                { name: `**\`\`\`${prefix}clean\`\`\`**`, value: '**clean message**', inline: false },
                 { name: `**\`\`\`${prefix}invite\`\`\`**`, value: '**Support Us!**', inline: false },
                 { name: `**\`\`\`${prefix}samp\`\`\`**`, value: '**Getting information on other server**', inline: false },
             ],
