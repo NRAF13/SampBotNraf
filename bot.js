@@ -8,7 +8,7 @@ const { getServerPing, getServerOnline } = require('./src/samp.js')
 require('discord-buttons')(client)
 const { MessageButton, MessageActionRow } = require('discord-buttons')
 const ticket = require('djs-tickets')
-let Samp_IP = "s1.dewatarp.xyz"
+let Samp_IP = "139.99.125.54"
 let Samp_Port = 7777
 /*const mysql = require('mysql');
 const RowDataPacket = require('mysql/lib/protocol/packets/RowDataPacket');
