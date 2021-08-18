@@ -10,14 +10,14 @@ const { MessageButton, MessageActionRow } = require('discord-buttons')
 const ticket = require('djs-tickets')
 let Samp_IP = "s1.dewatarp.xyz"
 let Samp_Port = 7777
-const mysql = require('mysql');
+/*const mysql = require('mysql');
 const RowDataPacket = require('mysql/lib/protocol/packets/RowDataPacket');
 const sqlcon = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
     password: '',
     database: 'uirp'
-})
+})*/
 /*sqlcon.connect()
 sqlcon.query('SELECT * FROM `samp` WHERE `id` = 0', [], function(err,row){
     if(row)
@@ -336,7 +336,7 @@ function clearmsg(msg,params)
     }
 }
 
-function stats(msg,params)
+/*function stats(msg,params)
 {
     if(params)
     {
@@ -382,7 +382,7 @@ function stats(msg,params)
     {
         msg.reply('USAGE: ```!stats [IC NAME]```')
     }
-}
+}*/
 
 client.on('message', msg => {
     if(!msg.content.startsWith(prefix) || msg.author.bot) return
@@ -585,9 +585,9 @@ client.on('message', msg => {
                 .setTimestamp(new Date())
                 msg.channel.send(inv)
                 break;
-            case "stats":
+            /*case "stats":
                 stats(msg, parameters.join(" "))
-                break;
+                break;*/
             case "help":
                 helpinfo(msg)
                 break;
