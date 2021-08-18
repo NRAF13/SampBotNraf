@@ -35,7 +35,7 @@ sqlcon.query('SELECT * FROM `samp` WHERE `id` = 0', [], function(err,row){
 })*/
 const prefix = "!";
 
-ticket.token(config.token)
+ticket.token(process.env.BOT_TOKEN)
 ticket.prefix(prefix)
 
 var options = {
