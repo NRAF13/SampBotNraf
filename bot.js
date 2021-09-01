@@ -1,13 +1,22 @@
-const { Client, MessageEmbed, Channel, Message } = require('discord.js');
-const discord = require('discord.js')
+const { MessageEmbed, Channel, Message } = require('discord.js');
+const Discord = require('discord.js')
 const { get } = require('request');
-const client = new Client;
+const client = new Discord.Client({
+    partials: ["MESSAGE", "USER", "REACTION"]
+  });
 global.config = require("./config.json")
 const query = require("samp-query");
 const { getServerPing, getServerOnline } = require('./src/samp.js')
 require('discord-buttons')(client)
 const { MessageButton, MessageActionRow } = require('discord-buttons')
 //const ticket = require('djs-tickets')
+const enmap = require("enmap")
+const settings = new enmap({
+    name: "settings",
+    autoFetch: true,
+    cloneLevel: "deep",
+    fetchAll: true
+  });
 let Samp_IP = "139.99.125.54"
 let Samp_Port = 7777
 /*const mysql = require('mysql');
@@ -35,7 +44,7 @@ sqlcon.query('SELECT * FROM `samp` WHERE `id` = 0', [], function(err,row){
 })*/
 const prefix = "!";
 
-/*ticket.token(process.env.BOT_TOKEN)
+/*ticket.token(config.token)
 ticket.prefix(prefix)*/
 
 var options = {
@@ -384,11 +393,39 @@ function clearmsg(msg,params)
     }
 }*/
 
-client.on('message', msg => {
+client.on('message', async msg => {
     if(!msg.content.startsWith(prefix) || msg.author.bot) return
     const args = msg.content.trim().split(/\s+/g)
     const cmd = args.shift().toLowerCase()
 
+    if(cmd == "!close")
+    {
+        if(!msg.channel.name.includes("ticket-")){
+            msg.reply("You can't use that here")
+        }
+        msg.channel.send("ticket support will close in 5 second")
+        setTimeout(function(){
+            msg.channel.delete()
+        }, 5000)
+    }
+    if(cmd == "!ticket-setup")
+    {
+        if(!msg.member.hasPermission('ADMINISTRATOR')) return msg.reply("You dont have permission")
+        let channels = msg.mentions.channels.first()
+        if(!channels) return msg.reply("Mention the channel")
+
+        let set = await channels.send(
+            new MessageEmbed()
+            .setTitle('Dewata Roleplay Support')
+            .setDescription("**__Jika mengalami kendala teknis terkait server DEWATARP, silahkan tekan reaction dibawah.\nHARAP DIERPHATIKAN!\nSetelah membuka tiket harap tanggung jawab__**\n\n**Hanya klik reaction jika benar-benar butuh bantuan atau hendak menyampaikan sesuatu\nJangan bermain-main dengan support ini resiko banned.\nUntuk mempercepat penanganan harap lengkapi format berikut\n```Nama:\nDetail Keluhan\nScreenshot```**")
+            .setFooter("Dewata Roleplay")
+            .setTimestamp(new Date())
+            .setColor(0x800080)
+        )
+        set.react("🎫")
+        settings.set(`${msg.guild.id}-ticket`, set.id)
+        msg.channel.send("Ticket setup done")
+    }
     if(cmd == '!samp')
     {
         if(!args.length) return msg.channel.send("USAGE: !samp [Ip][Port]")
@@ -585,6 +622,24 @@ client.on('message', msg => {
                 .setTimestamp(new Date())
                 msg.channel.send(inv)
                 break;
+            /*case "ticket-setup":
+                if(!msg.member.hasPermission('ADMINISTRATOR')) return msg.reply("You dont have permission")
+                let channel = msg.mentions.channels.first()
+                if(!channel) return msg.reply("Mention the channel")
+                let sent = channel.send(
+                    new MessageEmbed()
+                    .setTitle('Dewata Roleplay Support')
+                    .setDescription("**__Jika mengalami kendala teknis terkait server DEWATARP, silahkan tekan reaction dibawah.\nHARAP DIERPHATIKAN!\nSetelah membuka tiket harap tanggung jawab__**\n\n**Hanya klik reaction jika benar-benar butuh bantuan atau hendak menyampaikan sesuatu\nJangan bermain-main dengan support ini resiko banned.\nUntuk mempercepat penanganan harap lengkapi format berikut\n```Nama:\nDetail Keluhan\nScreenshot")
+                    .setFooter("Dewata Roleplay")
+                    .setTimestamp(new Date())
+                    .setColor(0x800080)
+                )
+
+                msent.rea
+                settings.set(`${msg.guild.id}-ticket`, sent.id);
+
+                msg.channel.send("Ticket System Setup Done!");
+                break;*/
             /*case "stats":
                 stats(msg, parameters.join(" "))
                 break;*/
@@ -593,6 +648,50 @@ client.on('message', msg => {
                 break;
         }
     }
+})
+
+client.on("messageReactionAdd", async (reaction, user, message) => {
+    if(user.partial) await user.fetch()
+    if(reaction.partial) await reaction.fetch()
+    if(reaction.message.partial) await reaction.message.fetch()
+
+    if(user.bot) return
+    let ticketid = await settings.get(`${reaction.message.guild.id}-ticket`);
+
+    if(!ticketid) return
+    if (reaction.message.id == ticketid && reaction.emoji.name == "🎫") {
+        reaction.users.remove(user);
+    
+        reaction.message.guild.channels
+          .create(`ticket-${user.username}`, {
+            permissionOverwrites: [
+              {
+                id: user.id,
+                allow: ["SEND_MESSAGES", "VIEW_CHANNEL"]
+              },
+              {
+                id: reaction.message.guild.roles.everyone,
+                deny: ["VIEW_CHANNEL"]
+              },
+              {
+                id: reaction.message.guild.roles.cache.find(
+                  role => role.name === "Administrator"
+                ),
+                allow: ["SEND_MESSAGES", "VIEW_CHANNEL"]
+              }
+            ],
+            type: "text"
+          })
+          .then(async channel => {
+            channel.send(
+              `<@${user.id}>`,
+              new Discord.MessageEmbed()
+                .setTitle("Dewata Roleplay Support")
+                .setDescription("Silahkan tunggu team support merespon")
+                .setColor("RANDOM")
+            );
+          });
+      }
 })
 
 client.login(config.token);
